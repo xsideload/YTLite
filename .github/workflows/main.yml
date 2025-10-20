@@ -3,7 +3,6 @@ name: Create YouTube Plus app
 on:
   workflow_dispatch:
     inputs:
-
       enable_youpip:
         description: "Integrate YouPiP"
         type: boolean
@@ -42,7 +41,7 @@ on:
 
       tweak_version:
         description: "The version of the tweak to use. Enter the version manually from dayanch96/YTLite/releases or leave default"
-        default: "5.2b3"
+        default: "5.2b4"
         required: true
         type: string
 
@@ -70,7 +69,7 @@ concurrency:
 
 jobs:
   build:
-    name: 
+    name:
     runs-on: macos-latest
     permissions:
       contents: write
@@ -86,6 +85,15 @@ jobs:
         uses: levibostian/action-hide-sensitive-inputs@v1
         with:
           exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_youpip,enable_yq,enable_ytuhd,info_note,tweak_version
+
+      - name: Download YouTube Plus (modified)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          (
+          cd ${{ github.workspace }}/main
+          gh release download --repo ${{ github.repository }} data --pattern "com.dvntm.ytlite_5.2b4_iphoneos-arm64.deb" --output ${{ github.workspace }}/ytplus.deb
+          )
 
       - name: Download and validate IPA
         run: |
@@ -138,11 +146,11 @@ jobs:
       - name: Install cyan
         run: pipx install --force https://github.com/asdfzxcvbn/pyzule-rw/archive/main.zip
 
-      - name: Download YouTube Plus
-        id: download_ytp
-        run: |
-          deb_url="https://github.com/dayanch96/YTLite/releases/download/v${{ inputs.tweak_version }}/com.dvntm.ytlite_${{ inputs.tweak_version }}_iphoneos-arm.deb"
-          wget "$deb_url" --no-verbose -O ${{ github.workspace }}/ytplus.deb
+      # - name: Download YouTube Plus
+      #   id: download_ytp
+      #   run: |
+      #     deb_url="https://github.com/dayanch96/YTLite/releases/download/v${{ inputs.tweak_version }}/com.dvntm.ytlite_${{ inputs.tweak_version }}_iphoneos-arm.deb"
+      #     wget "$deb_url" --no-verbose -O ${{ github.workspace }}/ytplus.deb
 
       - name: Clone Open in YouTube (Safari extension)
         run: |
